@@ -1,3 +1,5 @@
+--make suggestions or report bugs: https://fatality.win/threads/cool-c4-timer.6080/
+
 local render = fatality.render
 local events = csgo.interface_handler:get_events()
 local cvar = csgo.interface_handler:get_cvar()
