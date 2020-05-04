@@ -121,8 +121,6 @@ function on_paint()
         end
         render:text(font, screen_size.x - (timers.defusing + 40 - timers.timefordef) * (screen_size.x / 40) + 2, 9, string.format("%2.2f", timers.timefordef - timers.defusing), csgo.color(255, 255, 255, 200))
         render:rect_filled(0, 12, screen_size.x - (timers.defusing + 40 - timers.timefordef) * (screen_size.x / 40), 12, csgo.color(def_colors.r, def_colors.g, def_colors.b, 130))
-        cvar:print_console("BOMB:" .. ", planted:" .. tostring(bomb.planted)  .. ", planting:" .. tostring(bomb.planting)  .. ", defusing:" .. tostring(bomb.defusing)  .. ", planted_time:" .. tostring(bomb.planted_time)  .. ", planting_time:" .. tostring(bomb.planting_time)  .. ", haskit:" .. tostring(bomb.haskit)  .. "\n", csgo.color(0, 200, 255, 255))
-        cvar:print_console("TIMERS:"  .. ", bomb:" .. tostring(timers.bomb)  .. ", planting:" .. tostring(timers.planting)  .. ", defusing:" .. tostring(timers.defusing)  .. ", timefordef:" .. tostring(timers.timefordef) .. "\n", csgo.color(0, 200, 255, 255))
     end
 end
 
