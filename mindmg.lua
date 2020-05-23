@@ -1,17 +1,17 @@
--- beta // by fipnooone
-
-local globals = csgo.interface_handler:get_global_vars( );
+--make suggestions or report bugs: https://fatality.win/threads/min-damage-hitchance-bind.6650/
+local globals = csgo.interface_handler:get_global_vars();
 
 local menu = fatality.menu;
 local config = fatality.config;
 local input = fatality.input;
-
 local render = fatality.render;
 
 local options = config:add_item("options", 0);
 local options_combo = menu:add_combo("Min-damage bind", "Rage", "Aimbot", "Aimbot", options);
 options_combo:add_item("Hold", options);
 options_combo:add_item("Toggle", options);
+
+local key = 0x06; -- change here
 
 local auto_cfg, awp_cfg, pistols_cfg, scout_cfg, heavyp_cfg, other_cfg =
     {
@@ -66,7 +66,6 @@ local backups = {
     }
 };
 
-
 local auto_menu, awp_menu, pistols_menu, scout_menu, heavyp_menu, other_menu =
     {
         menu:add_slider("[damage] -- Auto", "Rage", "Aimbot", "Aimbot", auto_cfg.dmg, 0, 100, 0),
@@ -93,9 +92,8 @@ local auto_menu, awp_menu, pistols_menu, scout_menu, heavyp_menu, other_menu =
         menu:add_slider("[hitchance]", "Rage", "Aimbot", "Aimbot", other_cfg.htc, 0, 100, 0)
     }
 
-
 function paint_mindamage_indicator()
-    render:indicator(10, 600, "DMG", true , -1);
+    render:indicator(10, 520, "DMG", true , -1);
 end
 
 function manage_menu(toggle)
@@ -169,7 +167,6 @@ function manage_menu(toggle)
     end
 end
 
-local key = 0x06; -- change here
 local last_timer = globals.tickcount;
 
 function on_paint()
