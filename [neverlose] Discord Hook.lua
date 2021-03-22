@@ -13,8 +13,8 @@ local Prediction_switch = menu.Switch("Webhook:", "Prediction misses", true)
 local UserShow_switch = menu.Switch("Webhook:", "Log username", false)
 local webhookUrl = menu.TextBox("Webhook:", "Webhook URL:", 256, "")
 
-local DRP_switch = menu.Switch("Discord Rich Presence [BETA]:", "On", false)
-local RPC_Combo = menu.MultiCombo("Discord Rich Presence [BETA]:", "Show:", {"Server IP", "Server Name", "Team scores", "Your score"}, 0)
+local DRP_switch = menu.Switch("Discord Rich Presence:", "On", false)
+local RPC_Combo = menu.MultiCombo("Discord Rich Presence:", "Show:", {"Server IP", "Server Name", "Team scores", "Your score"}, 0)
 -- Menu >
 
 local username = cheat.GetCheatUserName()
@@ -323,7 +323,7 @@ local function webhook(message)
             "Hit", 53606,
             message["targetname"],
             message["damage"]["did"],
-            hitgroups[message["hitgroup"]["hit"]],
+            hitgroups[message["hitgroup"]["estimated"]],
             message["hitchance"],
             message["backtrack"],
             "",
@@ -337,7 +337,7 @@ local function webhook(message)
             "Missed shot due to Resolver", 16333359,
             message["targetname"],
             "Estimated: "..message["damage"]["estimated"],
-            hitgroups[message["hitgroup"]["hit"]],
+            hitgroups[message["hitgroup"]["estimated"]],
             message["hitchance"],
             message["backtrack"],
             "",
@@ -351,7 +351,26 @@ local function webhook(message)
             "Missed shot due to Spread", 16302848,
             message["targetname"],
             "Estimated: "..message["damage"]["estimated"],
-            hitgroups[message["hitgroup"]["hit"]],
+            hitgroups[message["hitgroup"]["estimated"]],
+            message["hitchance"],
+            message["backtrack"],
+            string.format("\n"..[[
+                {
+                    name: "Spread degree:",
+                    value: "%s"
+                },
+            ]], message["spread_degree"]),
+            weapons[message["weaponId"]],
+            message["username"],
+            webhookUrl:GetString()
+        ))
+    end
+    if Spread_switch:GetBool() and message["reason"] == 3 then
+        g_Panorama:Exec(string.format(embed, 
+            "Missed shot due to Occlusion", 8007566,
+            message["targetname"],
+            "Estimated: "..message["damage"]["estimated"],
+            hitgroups[message["hitgroup"]["estimated"]],
             message["hitchance"],
             message["backtrack"],
             string.format("\n"..[[
@@ -370,7 +389,7 @@ local function webhook(message)
             "Missed shot due to Prediction error", 10887193,
             message["targetname"],
             "Estimated: "..message["damage"]["estimated"],
-            hitgroups[message["hitgroup"]["hit"]],
+            hitgroups[message["hitgroup"]["estimated"]],
             message["hitchance"],
             message["backtrack"],
             "",
@@ -480,10 +499,10 @@ g_Panorama:Exec([[
     var teamdata;
 
     function getCTscore() {
-        return teamdata.CT.score + "|sT0P";
+        return teamdata.CT.score
     }
     function getTscore() {
-        return teamdata.TERRORIST.score + "|sT0P";
+        return teamdata.TERRORIST.score
     }
     function getServerName() {
         return GameStateAPI.GetServerName();
@@ -498,13 +517,13 @@ g_Panorama:Exec([[
         return GameStateAPI.GetPlayerTeamName(xuid_);
     }
     function getKills(xuid_) {
-        return GameStateAPI.GetPlayerKills(xuid_).toString() + "|sT0P";
+        return GameStateAPI.GetPlayerKills(xuid_).toString()
     }
     function getAssists(xuid_) {
-        return GameStateAPI.GetPlayerAssists(xuid_).toString() + "|sT0P";
+        return GameStateAPI.GetPlayerAssists(xuid_).toString()
     }
     function getDeaths(xuid_) {
-        return GameStateAPI.GetPlayerDeaths(xuid_).toString() + "|sT0P";
+        return GameStateAPI.GetPlayerDeaths(xuid_).toString()
     }
     function getMapName() {
         return GameStateAPI.GetMapName();
@@ -529,11 +548,11 @@ local function interval()
                     servername = string.sub(servername, 8, 31).."..."
                 end
                 details = servername.." - IP: "..g_EngineClient:GetNetChannelInfo():GetAddress()
-            elseif RPC_Combo:GetBool(0) and string.sub(g_Panorama:Exec([[IsConnectedCommunity()]]), 1, 1) == "t" then
+            elseif RPC_Combo:GetBool(0) and g_Panorama:Exec([[IsConnectedCommunity()]]) == "true" then
                 details = g_EngineClient:GetNetChannelInfo():GetAddress()
-            elseif RPC_Combo:GetBool(1) and string.sub(g_Panorama:Exec([[IsConnectedCommunity()]]), 1, 1) == "t" then
+            elseif RPC_Combo:GetBool(1) and g_Panorama:Exec([[IsConnectedCommunity()]]) == "true" then
                 details = string.sub(servername, 8, 126)
-            elseif string.sub(g_Panorama:Exec([[IsConnectedCommunity()]]), 1, 1) == "t" then
+            elseif g_Panorama:Exec([[IsConnectedCommunity()]]) == "true" then
                 details = "Community server"
             else
                 details = g_Panorama:Exec([[getGameMode()]])
@@ -544,11 +563,11 @@ local function interval()
             ]])
 
             local team = g_Panorama:Exec([[getTeam(xuid)]])
-            local CTscore = g_Panorama:Exec([[getCTscore().toString()]]):gsub("|sT0P(.*)", "")
-            local Tscore = g_Panorama:Exec([[getTscore().toString()]]):gsub("|sT0P(.*)", "")
-            local kills = g_Panorama:Exec([[getKills(xuid)]]):gsub("|sT0P(.*)", "")
-            local assists = g_Panorama:Exec([[getAssists(xuid)]]):gsub("|sT0P(.*)", "")
-            local deaths = g_Panorama:Exec([[getDeaths(xuid)]]):gsub("|sT0P(.*)", "")
+            local CTscore = g_Panorama:Exec([[getCTscore().toString()]])
+            local Tscore = g_Panorama:Exec([[getTscore().toString()]])
+            local kills = g_Panorama:Exec([[getKills(xuid)]])
+            local assists = g_Panorama:Exec([[getAssists(xuid)]])
+            local deaths = g_Panorama:Exec([[getDeaths(xuid)]])
             if RPC_Combo:GetBool(2) and RPC_Combo:GetBool(3) then
                 if team == "CT" then
                     state = "Score: CT: "..CTscore.." ["..kills.."-"..assists.."-"..deaths.."] / T: "..Tscore.." "
